@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Calculator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styling to ensure table and form fit well */
+        .container {
+            max-width: 900px;
+        }
+        .form-container {
+            margin-top: 30px;
+        }
+        .table-container {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans flex justify-center items-start py-6 px-4">
+    <div class="container bg-white rounded-xl shadow-xl p-6 w-full mx-auto">
+
+        <!-- Language Selection -->
+        <div class="mb-6 text-center">
+            <label for="languageSelect" class="block text-xl font-semibold mb-2">Select Language:</label>
+            <select id="languageSelect" onchange="changeLanguage()" class="px-4 py-2 border border-gray-300 rounded-lg">
+                <option value="en">English</option>
+                <option value="km">ខ្មែរ</option>
+            </select>
+        </div>
+
+        <!-- Loan Calculator Form -->
+        <div class="form-container">
+            <h2 id="loanCalculatorTitle" class="text-2xl font-semibold text-center mb-4">Loan Calculator</h2>
+
+            <div class="mb-4">
+                <label for="loanAmount" id="loanAmountLabel" class="block text-lg mb-2">Loan Amount</label>
+                <input type="number" id="loanAmount" placeholder="Enter loan amount" class="w-full p-3 border border-gray-300 rounded-lg" required>
+            </div>
+
+            <div class="mb-4">
+                <label for="interestRate" id="interestRateLabel" class="block text-lg mb-2">Interest Rate (%)</label>
+                <input type="number" id="interestRate" placeholder="Enter interest rate" class="w-full p-3 border border-gray-300 rounded-lg" required>
+            </div>
+
+            <div class="mb-4">
+                <label for="loanTerm" id="loanTermLabel" class="block text-lg mb-2">Loan Term (Years)</label>
+                <input type="number" id="loanTerm" placeholder="Enter loan term in years" class="w-full p-3 border border-gray-300 rounded-lg" required>
+            </div>
+
+            <div class="mb-6">
+                <input type="submit" value="Calculate" onclick="calculateLoan()" id="calculateBtn" class="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 cursor-pointer">
+            </div>
+
+            <div class="result text-center text-lg font-semibold" id="result"></div>
+        </div>
+
+        <!-- Payment Schedule Table -->
+        <div class="table-container hidden" id="tableContainer">
+            <h3 id="paymentScheduleTitle" class="text-xl font-semibold text-center mb-4">Payment Schedule</h3>
+            <table id="paymentTable" class="w-full table-auto border-collapse">
+                <thead>
+                    <tr>
+                        <th id="monthColumn" class="border p-3 text-left">Month</th>
+                        <th id="paymentColumn" class="border p-3 text-left">Payment</th>
+                        <th id="principalColumn" class="border p-3 text-left">Principal</th>
+                        <th id="interestColumn" class="border p-3 text-left">Interest</th>
+                        <th id="balanceColumn" class="border p-3 text-left">Balance</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="mt-6 text-center">
+                <button onclick="exportToExcel()" id="exportBtn" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 cursor-pointer">
+                    Export to Excel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Translations for different languages
+        const translations = {
+            en: {
+                loanCalculatorTitle: "Loan Calculator",
+                loanAmountLabel: "Loan Amount",
+                interestRateLabel: "Interest Rate (%)",
+                loanTermLabel: "Loan Term (Years)",
+                calculateBtn: "Calculate",
+                paymentScheduleTitle: "Payment Schedule",
+                monthColumn: "Month",
+                paymentColumn: "Payment",
+                principalColumn: "Principal",
+                interestColumn: "Interest",
+                balanceColumn: "Balance",
+                exportBtn: "Export to Excel",
+                result: "Please enter valid numbers for all fields."
+            },
+            km: {
+                loanCalculatorTitle: "គណនីប្រាក់កម្ចី",
+                loanAmountLabel: "ចំនួនប្រាក់កម្ចី",
+                interestRateLabel: "អត្រាការប្រាក់ (%)",
+                loanTermLabel: "រយៈពេលបង់ប្រាក់ (ឆ្នាំ)",
+                calculateBtn: "គណនាប្រាក់",
+                paymentScheduleTitle: "កាលបរិច្ឆេទការបង់ប្រាក់",
+                monthColumn: "ខែ",
+                paymentColumn: "ការបង់ប្រាក់",
+                principalColumn: "ចំណតខ្ចី",
+                interestColumn: "ការប្រាក់",
+                balanceColumn: "នៅសល់",
+                exportBtn: "នាំចេញទៅ Excel",
+                result: "សូមបញ្ចូលលេខត្រឹមត្រូវសម្រាប់រាល់វិចារណកាល។"
+            }
+        };
+
+        // Change language function
+        function changeLanguage() {
+            const language = document.getElementById("languageSelect").value;
+            const translation = translations[language];
+
+            // Update text content based on selected language
+            document.getElementById("loanCalculatorTitle").innerText = translation.loanCalculatorTitle;
+            document.getElementById("loanAmountLabel").innerText = translation.loanAmountLabel;
+            document.getElementById("interestRateLabel").innerText = translation.interestRateLabel;
+            document.getElementById("loanTermLabel").innerText = translation.loanTermLabel;
+            document.getElementById("calculateBtn").value = translation.calculateBtn;
+            document.getElementById("paymentScheduleTitle").innerText = translation.paymentScheduleTitle;
+            document.getElementById("monthColumn").innerText = translation.monthColumn;
+            document.getElementById("paymentColumn").innerText = translation.paymentColumn;
+            document.getElementById("principalColumn").innerText = translation.principalColumn;
+            document.getElementById("interestColumn").innerText = translation.interestColumn;
+            document.getElementById("balanceColumn").innerText = translation.balanceColumn;
+            document.getElementById("exportBtn").innerText = translation.exportBtn;
+        }
+
+        function calculateLoan() {
+            const loanAmount = parseFloat(document.getElementById("loanAmount").value);
+            const interestRate = parseFloat(document.getElementById("interestRate").value) / 100 / 12;
+            const loanTerm = parseInt(document.getElementById("loanTerm").value) * 12;
+
+            if (isNaN(loanAmount) || isNaN(interestRate) || isNaN(loanTerm) || loanAmount <= 0 || interestRate <= 0 || loanTerm <= 0) {
+                const language = document.getElementById("languageSelect").value;
+                document.getElementById("result").innerText = translations[language].result;
+                return;
+            }
+
+            const monthlyPayment = (loanAmount * interestRate) / (1 - Math.pow(1 + interestRate, -loanTerm));
+
+            generatePaymentSchedule(loanAmount, interestRate, loanTerm, monthlyPayment);
+
+            const formattedMonthlyPayment = monthlyPayment.toFixed(2);
+            document.getElementById("result").innerText = `Monthly Payment: $${formattedMonthlyPayment}`;
+        }
+
+        function generatePaymentSchedule(loanAmount, interestRate, loanTerm, monthlyPayment) {
+            let balance = loanAmount;
+            let tableBody = document.getElementById("paymentTable").getElementsByTagName("tbody")[0];
+            tableBody.innerHTML = '';
+            for (let month = 1; month <= loanTerm; month++) {
+                let interestPayment = balance * interestRate;
+                let principalPayment = monthlyPayment - interestPayment;
+                balance -= principalPayment;
+
+                if (balance < 0) {
+                    balance = 0;
+                }
+
+                let row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td class="border p-3">${month}</td>
+                    <td class="border p-3">${monthlyPayment.toFixed(2)}</td>
+                    <td class="border p-3">${principalPayment.toFixed(2)}</td>
+                    <td class="border p-3">${interestPayment.toFixed(2)}</td>
+                    <td class="border p-3">${balance.toFixed(2)}</td>
+                `;
+            }
+
+            document.getElementById("tableContainer").classList.remove("hidden");
+        }
+
+        function exportToExcel() {
+            let table = document.getElementById("paymentTable");
+            let rows = table.rows;
+            let csv = [];
+
+            for (let i = 0; i < rows.length; i++) {
+                let row = rows[i];
+                let rowData = [];
+                for (let j = 0; j < row.cells.length; j++) {
+                    rowData.push(row.cells[j].innerText);
+                }
+                csv.push(rowData.join(","));
+            }
+
+            let csvFile = new Blob([csv.join("\n")], { type: 'text/csv' });
+            let downloadLink = document.createElement('a');
+            downloadLink.download = 'loan_schedule.csv';
+            downloadLink.href = URL.createObjectURL(csvFile);
+            downloadLink.click();
+        }
+    </script>
+</body>
+</html>
